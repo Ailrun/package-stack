@@ -1,0 +1,69 @@
+#+TITLE: Package Stack - Package Manager with Elegant Dependence Managing
+#+AUTHOR: Junyoung Clare Jang
+#+EMAIL: jjc9310@gmail.com
+#+DATE: <2017-01-31 Tue>
+#+OPTIONS: toc:2
+
+* Table of Contents
+  [TABLE-OF-CONTENTS]
+
+* Introduction
+
+  The `package-stack' defines macro for stacking
+  isolated package configurations while keep their
+  dependence in mind.  By using this package, you can
+  configure your ".emacs" file more neat way.
+
+  Of course, you can extend `package-stack' for your
+  specific usage!
+
+  For more detail, please see README.org.
+
+* Start Comments
+
+  #+BEGIN_SRC elisp
+    ;;; package-stack --- Package Manager with Elegant Dependence Managing.
+
+    ;; Copyright (C) 2017- Junyoung Clare Jang
+
+    ;; Author: Junyoung Clare Jang <jjc9310@gmail.com>
+    ;; Maintainer: Junyoung Clare Jang <jjc9310@gmail.com>
+    ;; Created: 31 Jan 2017
+    ;; Version: 0.1
+    ;; Package-Requires: ()
+    ;; Keywords: dotemacs startup speed config package
+    ;; URL: https://github.com/ailrun/package-stack
+
+
+    ;;; Commentary:
+
+    ;; The `package-stack' defines macro for stacking
+    ;; isolated package configurations while keep their
+    ;; dependence in mind.  By using this package, you can
+    ;; configure your ".emacs" file more neat way.
+    ;;
+    ;; Of course, you can extend `package-stack' for your
+    ;; specific usage!
+    ;;
+    ;; For more detail, please see README.org.
+
+    ;;; Code:
+  #+END_SRC
+
+* The *package-stack* macro
+
+  #+BEGIN_SRC elisp
+    (defmacro package-stack (name :RE))
+  #+END_SRC
+
+* Provide Package
+
+  #+BEGIN_SRC  elisp
+    (provide 'package-stack)
+  #+END_SRC
+
+* End Comments
+
+  #+BEGIN_SRC elisp
+    ;;; package-stack.el ends here
+  #+END_SRC
