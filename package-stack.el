@@ -1,4 +1,4 @@
-;;; package-stack --- Package Manager with Elegant Dependence Managing.
+;;; package-stack --- Configuration Manager with Elegant Dependence Managing.
 
 ;; Copyright (C) 2017- Junyoung Clare Jang
 
