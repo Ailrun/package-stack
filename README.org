@@ -17,53 +17,22 @@
   Of course, you can extend `package-stack' for your
   specific usage!
 
-  For more detail, please see README.org.
+* Keywords
 
-* Start Comments
+  1. :ignored
+  2. :now
+  3. :on-start
+  4. :first CODE
+  5. :modes FORM
+  6. :interpreters FORM
+  7. :commands COMMANDS
+  8. :before-deps CODE
+  9. :deps DEPS
+  10. :before-load CODE
+  11. :after-load CODE
+  12. :last CODE
 
-  #+BEGIN_SRC elisp
-    ;;; package-stack --- Package Manager with Elegant Dependence Managing.
+** ignored
 
-    ;; Copyright (C) 2017- Junyoung Clare Jang
-
-    ;; Author: Junyoung Clare Jang <jjc9310@gmail.com>
-    ;; Maintainer: Junyoung Clare Jang <jjc9310@gmail.com>
-    ;; Created: 31 Jan 2017
-    ;; Version: 0.1
-    ;; Package-Requires: ()
-    ;; Keywords: dotemacs startup speed config package
-    ;; URL: https://github.com/ailrun/package-stack
-
-
-    ;;; Commentary:
-
-    ;; The `package-stack' defines macro for stacking
-    ;; isolated package configurations while keep their
-    ;; dependence in mind.  By using this package, you can
-    ;; configure your ".emacs" file more neat way.
-    ;;
-    ;; Of course, you can extend `package-stack' for your
-    ;; specific usage!
-    ;;
-    ;; For more detail, please see README.org.
-
-    ;;; Code:
-  #+END_SRC
-
-* The *package-stack* macro
-
-  #+BEGIN_SRC elisp
-    (defmacro package-stack (name :RE))
-  #+END_SRC
-
-* Provide Package
-
-  #+BEGIN_SRC  elisp
-    (provide 'package-stack)
-  #+END_SRC
-
-* End Comments
-
-  #+BEGIN_SRC elisp
-    ;;; package-stack.el ends here
-  #+END_SRC
+   Ignore this configuration when this keyword is given.
+   `package-stack` works as if this configuration
