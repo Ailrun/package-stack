@@ -1,38 +1,37 @@
-#+TITLE: Package Stack - Package Manager with Elegant Dependence Managing
+#+TITLE: package-stack
 #+AUTHOR: Junyoung Clare Jang
 #+EMAIL: jjc9310@gmail.com
 #+DATE: <2017-01-31 Tue>
-#+OPTIONS: toc:2
+#+DESCRIPTION: Package Manager with Elegant Dependence Managing
 
-* Table of Contents
-  [TABLE-OF-CONTENTS]
+Package Manager with Elegant Dependence Managing
 
-* Introduction
+* introduction
 
-  The `package-stack' defines macro for stacking
+  The *package-stack* defines macro for stacking
   isolated package configurations while keep their
-  dependence in mind.  By using this package, you can
+  dependence in mind. By using this package, you can
   configure your ".emacs" file more neat way.
 
-  Of course, you can extend `package-stack' for your
+  Of course, you can extend *package-stack* for your
   specific usage!
 
-* Keywords
+* keywords
 
-  1. :ignored
-  2. :now
-  3. :on-start
-  4. :first CODE
-  5. :modes FORM
-  6. :interpreters FORM
-  7. :commands COMMANDS
-  8. :before-deps CODE
-  9. :deps DEPS
-  10. :before-load CODE
-  11. :after-load CODE
-  12. :last CODE
+  - :ignored
+  - :now
+  - :on-start
+  - :first CODE
+  - :modes FORM
+  - :interpreters FORM
+  - :commands COMMANDS
+  - :before-deps CODE
+  - :deps DEPS
+  - :before-load CODE
+  - :after-load CODE
+  - :last CODE
 
-** ignored
+** :ignored
 
    Ignore this configuration when this keyword is given.
-   `package-stack` works as if this configuration
+   *package-stack* works as if this configuration
