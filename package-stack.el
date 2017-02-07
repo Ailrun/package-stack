@@ -124,9 +124,9 @@ just ignored with ‘package-stack’ itself."
 ;;
 
 (defun package-stack/validate-no-args (_name-sym args)
-  "Common validator for keywords with no ARGS.
+  "Common validator for no ARGS keywords.
 
-Keywords with no ARGS requires empty ARGS.
+Valid no ARGS keywords require empty ARGS.
 
 1. :keyword"
   (declare (indent 1))
@@ -135,15 +135,94 @@ Keywords with no ARGS requires empty ARGS.
   (null args))
 
 (defun package-stack/standardize-no-args (_name-sym args)
-  "Common standardizer for keywords with no ARGS.
+  "Common standardizer for no ARGS keywords.
 
-Standard keywords with no ARGS use nothing.
+Standard no ARGS keywords use nothing.
 
 1. :keyword"
   (declare (indent 1))
   (package-stack/debug-log
    "ARGS=%S" args)
   nil)
+
+(defun package-stack/validate-sexp-args (_name-sym args)
+  "Validatore for S-Exp ARGS keywords.
+
+Valid S-Exp ARGS keywords require S-Exps or a list of S-Exp.
+
+1. :keyword S-EXP ...
+2. :keyword (S-EXP ...)"
+  (declare (indent 1))
+  (package-stack/debug-log
+   "ARGS=%S" args)
+  (listp (car args)))
+
+(defun package-stack/standardize-sexp-args (_name-sym args)
+  "Standardizer for S-Exp ARGS keywords.
+
+Standard S-Exp ARGS keywords use S-Exps.
+
+1. :keyword S-EXP ..."
+  (declare (indent 1))
+  (package-stack/debug-log
+   "ARGS=%S" args)
+  (if (cdr args)
+      args
+    (car args)))
+
+(defun package-stack/validate-ss-pair-args (_name-sym args)
+  "Validator for string/symbol pair ARGS keywords.
+
+Valid string/symbol pair ARGS keywords require a list of string/symbol pair.
+
+1. :keyword ((STRING . SYMBOL) ...)"
+  (declare (indent 1))
+  (package-stack/debug-log
+   "ARGS=%S" args)
+  (and (listp args)
+       (--all? (and (consp it)
+                    (stringp (car it))
+                    (symbolp (cdr it)))
+               args)))
+
+(defun package-stack/standardize-ss-pair-args (_name-sym args)
+  "Standardizer for string/symbol pair ARGS keywords.
+
+Standard string/symbol piar keywords use a list of string/symbol pair.
+
+1. :keyword ((STRING . SYMBOL) ...)"
+  (declare (indent 1))
+  (package-stack/debug-log
+   "ARGS=%S" args)
+  args)
+
+(defun package-stack/validate-s-or-s-args (_name-sym args)
+  "Validator for string-or-symbol ARGS keywords.
+
+Valid string-or-symbol ARGS keywords require a list of, strings or symbols.
+
+1. :keyword (SYMBOL-OR-STRING ...)"
+  (declare (indent 1))
+  (package-stack/debug-log
+   "ARGS=%S" args)
+  (and (listp (car args))
+       (--all? (or (stringp it)
+                   (symbolp it))
+               (car args))))
+
+(defun package-stack/standardize-s-or-s-args (_name-sym args)
+  "Validator for string-or-symbol ARGS keywords.
+
+Standard string-or-symbol ARGS keywords use a list of symbols.
+
+1. :keyword (SYMBOL ...)"
+  (declare (indent 1))
+  (package-stack/debug-log
+   "ARGS=%S" args)
+  (--map (if (stringp it)
+             (intern it)
+           it)
+         args))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -172,122 +251,99 @@ Standard keywords with no ARGS use nothing.
 ;;; :first keyword
 ;;
 
-(defun package-stack/validate-:first (_name-sym args)
-  "Validatore for ‘:first’ keyword with ARGS.
+(defalias 'package-stack/validate-:first
+  'package-stack/validate-sexp-args)
 
-‘:first’ keyword requires S-Exps or a list of S-Exp.
-
-1. ‘:first’ S-EXP ...
-2. ‘:first’ (S-EXP ...)"
-  (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
-  (listp (car args)))
-
-(defun package-stack/standardize-:first (_name-sym args)
-  "Standardizer for ARGS of ‘:first’ keyword.
-
-Standard ‘:first’ keyword use S-Exps.
-
-1. ‘:first’ S-EXP ..."
-  (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
-  (if (cdr args)
-      args
-    (car args)))
+(defalias 'package-stack/standardize-:first
+  'package-stack/validate-sexp-args)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; :modes keyword
 ;;
 
-(defun package-stack/validate-:mode (_name-sym args)
-  "Validator for ‘:mode’ keyword with ARGS.
+(defalias 'package-stack/validate-:modes
+  'package-stack/validate-ss-pair-args)
 
-‘:mode’ keyword requires a list of string/symbol pair.
-
-1. ‘:mode’ ((STRING . SYMBOL) ...)"
-  (declare (indent 1))
-  (and (listp args)
-       (--all? (and (consp it)
-                    (stringp (car it))
-                    (symbolp (cdr it)))
-               args)))
-
-(defun package-stack/standardize-:mode (_name-sym args)
-  "Standardizer for ‘:mode’ keyword with ARGS.
-
-Standard ‘:mode’ keyword use a list of string/symbol pair.
-
-1. ‘:mode’ ((STRING . SYMBOL) ...)"
-  (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
-  args)
+(defalias 'package-stack/standardize-:modes
+  'package-stack/validate-ss-pair-args)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; :interpreters keyword
 ;;
 
+(defalias 'package-stack/validate-:interpreters
+  'package-stack/validate-ss-pair-args)
+
+(defalias 'package-stack/standardize-:interpreters
+  'package-stack/validate-ss-pair-args)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; :commands keyword
 ;;
+
+(defalias 'package-stack/validate-:commands
+  'package-stack/validate-s-or-s-args)
+
+(defalias 'package-stack/standardize-:commands
+  'package-stack/standardize-s-or-s-args)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; :before-deps keyword
 ;;
 
+(defalias 'package-stack/validate-:before-deps
+  'package-stack/validate-sexp-args)
+
+(defalias 'package-stack/standardize-:before-deps
+  'package-stack/validate-sexp-args)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; :deps keyword
 ;;
 
-(defun package-stack/validate-:deps (_name-sym args)
-  "Validator for ARGS of ‘:deps’ keyword.
+(defalias 'package-stack/validate-:deps
+  'package-stack/validate-s-or-s-args)
 
-‘:deps’ keyword requires a list of, strings or symbols.
-
-1. ‘:deps’ (SYMBOL-OR-STRING ...)"
-  (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
-  (and (listp (car args))
-       (--all? (or (stringp it)
-                   (symbolp it))
-               (car args))))
-
-(defun package-stack/standardize-:deps (_name-sym args)
-  "Validator for ARGS of ‘:deps’ keyword.
-
-Standard ‘:deps’ keyword use a list of symbols.
-
-1. ‘:deps’ (SYMBOL ...)"
-  (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
-  (--map (if (stringp it)
-             (intern it)
-           it)
-         args))
+(defalias 'package-stack/standardize-:deps
+  'package-stack/standardize-s-or-s-args)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; :before-load keyword
 ;;
 
+(defalias 'package-stack/validate-:before-load
+  'package-stack/validate-sexp-args)
+
+(defalias 'package-stack/standardize-:before-load
+  'package-stack/validate-sexp-args)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; :after-load keyword
 ;;
 
+(defalias 'package-stack/validate-:after-load
+  'package-stack/validate-sexp-args)
+
+(defalias 'package-stack/standardize-:after-load
+  'package-stack/validate-sexp-args)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; :last keyword
 ;;
+
+(defalias 'package-stack/validate-:last
+  'package-stack/validate-sexp-args)
+
+(defalias 'package-stack/standardize-:last
+  'package-stack/validate-sexp-args)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -327,11 +383,11 @@ Keywords in order they resolved.
            (valid (package-stack/standardize-keypl name-sym keypl)))
       t)))
 
-;; TEST:
-(package-stack this
-  :now
-  :first ((cons 1 2) (cons 2 3))
-  :deps (hi bi))
+;; ;; TEST:
+;; (package-stack this
+;;   :now
+;;   :first ((cons 1 2) (cons 2 3))
+;;   :deps (hi bi))
 
 (provide 'package-stack)
 
