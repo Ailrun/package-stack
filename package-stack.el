@@ -56,169 +56,179 @@ just ignored with ‘package-stack’ itself."
 
 
 
-(defun package-stack/settings-to-keypl (name-sym settings)
+(defun package-stack/settings-to-keyal (name-sym settings)
   "NAME-SYM SETTINGS."
   (declare (indent 1))
-  (let (result)
-    (while settings
-      (let* ((keyword (car settings))
-             (keyargstail (--split-with (not (keywordp it))
-                                        (cdr settings)))
-             (keyargs (car keyargstail))
-             (tail (cadr keyargstail)))
+  (--reduce-from
+   (if (keywordp it)
+       (progn
+         (when (alist-get it acc)
+           (error "%s has duplicated keyword %s"
+                  it name-sym))
+         (cons (cons it nil) acc))
+     (-let ((((keyword . keyargs) . tail) acc))
+       (cons (cons keyword (-snoc keyargs it)) tail)))
+    nil
+    settings))
 
-        (!cons (cons keyword keyargs) result)
-        (setq settings tail)))
-    result))
-
-(defun package-stack/standardize-keypl (name-sym keypl)
-  "Standardizer of NAME-SYM for all KEYPL."
+(defun package-stack/standardize-keyal (name-sym keyal)
+  "Standardizer of NAME-SYM for all KEYAL."
   (declare (indent 1))
-  (package-stack/debug-log
+  (package-stack/-debug-log
    "")
 
   (--map
-   (let* ((keyword (car it))
-          (args (cdr it))
-          (validator (intern (concat "package-stack/validate-"
-                                     (symbol-name keyword))))
-          (standardizer (intern (concat "package-stack/standardize-"
-                                        (symbol-name keyword))))
+   (-let* (((keyword . args) it)
+           (validator (intern (concat "package-stack/validate-"
+                                      (symbol-name keyword))))
+           (standardizer (intern (concat "package-stack/standardize-"
+                                         (symbol-name keyword))))
 
-          (validity (progn
-                      (cond ((eq keyword :ignored)
-                             (error (concat
-                                     "Unchecked :ignored was found in %s.  "
-                                     "Please report this via %s")
-                                    (symbol-name name-sym)
-                                    package-stack/github-url))
-                            ((functionp validator)
-                             (package-stack/debug-log
-                              "Validator=%s" validator)
-                             (funcall validator name-sym args))
-                            (t
-                             (error "No validator for %s was found"
-                                         keyword)))))
+           (validity
+            (progn
+              (cond ((eq keyword :ignored)
+                     (error (concat
+                             "%s has unchecked :ignored"
+                             ".  Please report this via %s")
+                            name-sym
+                            package-stack/github-url))
+                    ((functionp validator)
+                     (package-stack/-debug-log
+                      "Common validator of NAME-SYM=%s" validator)
+                     (funcall validator name-sym args))
+                    (t
+                     (error "No validator for %s was found"
+                            keyword)))))
 
-          (standard-args (progn
-                           (cond ((null validity)
-                                  (error "Keyword %s with invalid args %s"
-                                         args
-                                         keyword))
-                                 ((functionp standardizer)
-                                  (package-stack/debug-log
-                                   "Standardizer=%s" standardizer)
-                                  (funcall standardizer name-sym args))
-                                 (t
-                                  (error "No standardizer for %s was found"
-                                         keyword))))))
+           (standard-args
+            (progn
+              (cond ((null validity)
+                     (error "%s has keyword %s with invalid args %s"
+                            name-sym
+                            keyword
+                            args))
+                    ((functionp standardizer)
+                     (package-stack/-debug-log
+                      "Common standardizer of NAME-SYM=%s" standardizer)
+                     (funcall standardizer name-sym args))
+                    (t
+                     (error "No standardizer for %s was found"
+                            keyword))))))
 
-     (package-stack/verbose-log
+     (package-stack/-verbose-log
       "Standard Args of %s=%s" keyword standard-args)
      (cons keyword standard-args))
-   keypl))
+   keyal))
+
+(defun package-stack/sort-keyal (name-sym keyal)
+  "Sorting function for NAME-SYM.
+
+This function sorts keywords in KEYAL using ‘package-stack/keywords’."
+  (declare (indent 1))
+  (package-stack/-debug-log
+   ""))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Commons for keywords
 ;;
 
-(defun package-stack/validate-no-args (_name-sym args)
-  "Common validator for no ARGS keywords.
+(defun package-stack/validate-no-args (name-sym args)
+  "Common validator of NAME-SYM for no ARGS keywords.
 
 Valid no ARGS keywords require empty ARGS.
 
 1. :keyword"
   (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
+  (package-stack/-debug-log
+   "%s has ARGS=%S" name-sym args)
   (null args))
 
-(defun package-stack/standardize-no-args (_name-sym args)
-  "Common standardizer for no ARGS keywords.
+(defun package-stack/standardize-no-args (name-sym args)
+  "Common standardizer of NAME-SYM for no ARGS keywords.
 
 Standard no ARGS keywords use nothing.
 
 1. :keyword"
   (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
+  (package-stack/-debug-log
+   "%s has ARGS=%S" name-sym args)
   nil)
 
-(defun package-stack/validate-sexp-args (_name-sym args)
-  "Validatore for S-Exp ARGS keywords.
+(defun package-stack/validate-sexp-args (name-sym args)
+  "Common validator of NAME-SYM for S-Exp ARGS keywords.
 
 Valid S-Exp ARGS keywords require S-Exps or a list of S-Exp.
 
 1. :keyword S-EXP ...
 2. :keyword (S-EXP ...)"
   (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
+  (package-stack/-debug-log
+   "%s has ARGS=%S" name-sym args)
   (listp (car args)))
 
-(defun package-stack/standardize-sexp-args (_name-sym args)
-  "Standardizer for S-Exp ARGS keywords.
+(defun package-stack/standardize-sexp-args (name-sym args)
+  "Common standardizer of NAME-SYM for S-Exp ARGS keywords.
 
 Standard S-Exp ARGS keywords use S-Exps.
 
 1. :keyword S-EXP ..."
   (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
+  (package-stack/-debug-log
+   "%s has ARGS=%S" name-sym args)
   (if (cdr args)
       args
     (car args)))
 
-(defun package-stack/validate-ss-pair-args (_name-sym args)
-  "Validator for string/symbol pair ARGS keywords.
+(defun package-stack/validate-ss-pair-args (name-sym args)
+  "Common validator of NAME-SYM for string/symbol pair ARGS keywords.
 
 Valid string/symbol pair ARGS keywords require a list of string/symbol pair.
 
 1. :keyword ((STRING . SYMBOL) ...)"
   (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
+  (package-stack/-debug-log
+   "%s has ARGS=%S" name-sym args)
   (and (listp args)
        (--all? (and (consp it)
                     (stringp (car it))
                     (symbolp (cdr it)))
                args)))
 
-(defun package-stack/standardize-ss-pair-args (_name-sym args)
-  "Standardizer for string/symbol pair ARGS keywords.
+(defun package-stack/standardize-ss-pair-args (name-sym args)
+  "Common standardizer of NAME-SYM for string/symbol pair ARGS keywords.
 
 Standard string/symbol piar keywords use a list of string/symbol pair.
 
 1. :keyword ((STRING . SYMBOL) ...)"
   (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
+  (package-stack/-debug-log
+   "%s has ARGS=%S" name-sym args)
   args)
 
-(defun package-stack/validate-s-or-s-args (_name-sym args)
-  "Validator for string-or-symbol ARGS keywords.
+(defun package-stack/validate-s-or-s-args (name-sym args)
+  "Common validator of NAME-SYM for string-or-symbol ARGS keywords.
 
 Valid string-or-symbol ARGS keywords require a list of, strings or symbols.
 
 1. :keyword (SYMBOL-OR-STRING ...)"
   (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
+  (package-stack/-debug-log
+   "%s has ARGS=%S" name-sym args)
   (and (listp (car args))
        (--all? (or (stringp it)
                    (symbolp it))
                (car args))))
 
-(defun package-stack/standardize-s-or-s-args (_name-sym args)
-  "Validator for string-or-symbol ARGS keywords.
+(defun package-stack/standardize-s-or-s-args (name-sym args)
+  "Common validator of NAME-SYM for string-or-symbol ARGS keywords.
 
 Standard string-or-symbol ARGS keywords use a list of symbols.
 
 1. :keyword (SYMBOL ...)"
   (declare (indent 1))
-  (package-stack/debug-log
-   "ARGS=%S" args)
+  (package-stack/-debug-log
+   "%s has ARGS=%S" name-sym args)
   (--map (if (stringp it)
              (intern it)
            it)
@@ -234,6 +244,9 @@ Standard string-or-symbol ARGS keywords use a list of symbols.
 
 (defalias 'package-stack/standardize-:now
   'package-stack/standardize-no-args)
+
+;; "Resolver of NAME-SYM with STD-KEYAL for ‘:now’ keyword."
+(defun package-stack/resolve-:now (name-sym std-keyal))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -345,6 +358,17 @@ Standard string-or-symbol ARGS keywords use a list of symbols.
 (defalias 'package-stack/standardize-:last
   'package-stack/validate-sexp-args)
 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; package-stack/keystack
+;;
+
+(defvar package-stack/keystack [])
+
+(defun package-stack/keystack-insert-package (name-sym std-keyal))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; The package-stack macro
@@ -361,7 +385,7 @@ Keywords in order they resolved.
                     `package-stack' works as if this configuration
                     doesn't exists, even if there are wrong configurations.
 :now                Load immediatly when this keyword is given.
-                    With this keyword, ‘:dep’ keyword is ignored.
+                    With this keyword, ‘:deps’ keyword is ignored.
 :on-start           Load just after stack is configured when this keyword
                     is given.
 :first CODE         CODE to run before everything except
@@ -379,15 +403,13 @@ Keywords in order they resolved.
     (let* ((name-sym (if (stringp package-name)
                          (intern package-name)
                        package-name))
-           (keypl (package-stack/settings-to-keypl name-sym settings))
-           (valid (package-stack/standardize-keypl name-sym keypl)))
-      t)))
-
-;; ;; TEST:
-;; (package-stack this
-;;   :now
-;;   :first ((cons 1 2) (cons 2 3))
-;;   :deps (hi bi))
+           (keyal
+            (package-stack/settings-to-keyal name-sym settings)))
+      (setq keyal (package-stack/standardize-keyal name-sym keyal))
+      (setq keyal (package-stack/sort-keyal name-sym keyal))
+      (if (assq :now keyal)
+          (package-stack/resolve-:now name-sym keyal)
+        (package-stack/keystack-insert-package name-sym keyal)))))
 
 (provide 'package-stack)
 
