@@ -180,25 +180,31 @@ Standard S-Exp ARGS keywords use S-Exps.
       args
     (car args)))
 
-(defun package-stack/validate-ss-pair-args (name-sym args)
+(defun package-stack/validate-cons-ss-args (name-sym args)
   "Common validator of NAME-SYM for string/symbol pair ARGS keywords.
 
-Valid string/symbol pair ARGS keywords require a list of string/symbol pair.
+Valid cons of string/symbol ARGS keywords require cons cells of
+string and symbol or a list of cons cells of string and symbol.
 
 1. :keyword ((STRING . SYMBOL) ...)"
   (declare (indent 1))
   (package-stack/-debug-log
    "%s has ARGS=%S" name-sym args)
   (and (listp args)
-       (--all? (and (consp it)
-                    (stringp (car it))
-                    (symbolp (cdr it)))
+       (--all? (or
+                (and (listp it)
+                     (string-or-null-p (car it))
+                     (symbolp (cdr it)))
+                (and (listp (car it))
+                     (string-or-null-p (caar it))
+                     (symbolp (cdar it))))
                args)))
 
-(defun package-stack/standardize-ss-pair-args (name-sym args)
+(defun package-stack/standardize-cons-ss-args (name-sym args)
   "Common standardizer of NAME-SYM for string/symbol pair ARGS keywords.
 
-Standard string/symbol piar keywords use a list of string/symbol pair.
+Standard cons of string/symbol keywords use a list of
+cons cells of string and symbol.
 
 1. :keyword ((STRING . SYMBOL) ...)"
   (declare (indent 1))
@@ -276,10 +282,10 @@ Standard string-or-symbol ARGS keywords use a list of symbols.
 ;;
 
 (defalias 'package-stack/validate-:modes
-  'package-stack/validate-ss-pair-args)
+  'package-stack/validate-cons-ss-args)
 
 (defalias 'package-stack/standardize-:modes
-  'package-stack/validate-ss-pair-args)
+  'package-stack/validate-cons-ss-args)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -287,10 +293,10 @@ Standard string-or-symbol ARGS keywords use a list of symbols.
 ;;
 
 (defalias 'package-stack/validate-:interpreters
-  'package-stack/validate-ss-pair-args)
+  'package-stack/validate-cons-ss-args)
 
 (defalias 'package-stack/standardize-:interpreters
-  'package-stack/validate-ss-pair-args)
+  'package-stack/validate-cons-ss-args)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -409,7 +415,8 @@ Keywords in order they resolved.
       (setq keyal (package-stack/sort-keyal name-sym keyal))
       (if (assq :now keyal)
           (package-stack/resolve-:now name-sym keyal)
-        (package-stack/keystack-insert-package name-sym keyal)))))
+        (package-stack/keystack-insert-package name-sym keyal))
+      t)))
 
 (provide 'package-stack)
 
