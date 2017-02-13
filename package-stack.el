@@ -94,7 +94,7 @@ just ignored with ‘package-stack’ itself."
                             package-stack/github-url))
                     ((functionp validator)
                      (package-stack/-debug-log
-                      "Common validator of NAME-SYM=%s" validator)
+                      "Common validator of %s=%s" name-sym validator)
                      (funcall validator name-sym args))
                     (t
                      (error "No validator for %s was found"
@@ -109,7 +109,7 @@ just ignored with ‘package-stack’ itself."
                             args))
                     ((functionp standardizer)
                      (package-stack/-debug-log
-                      "Common standardizer of NAME-SYM=%s" standardizer)
+                      "Common standardizer of %s=%s" name-sym standardizer)
                      (funcall standardizer name-sym args))
                     (t
                      (error "No standardizer for %s was found"
@@ -121,12 +121,20 @@ just ignored with ‘package-stack’ itself."
    keyal))
 
 (defun package-stack/sort-keyal (name-sym keyal)
-  "Sorting function for NAME-SYM.
+  "Sorting function for settings of NAME-SYM.
 
 This function sorts keywords in KEYAL using ‘package-stack/keywords’."
   (declare (indent 1))
   (package-stack/-debug-log
-   ""))
+   "")
+  (if (--all? (member (car it) package-stack/keywords) keyal)
+      (let ((sorted-keyal
+             (--sort (< (-elem-index it package-stack/keywords)
+                        (-elem-index other package-stack/keywords))
+                     keyal)))
+        (package-stack/-debug-log
+         "SORTED-KEYAL=%S" sorted-keyal))
+    (error "%s has a keyword not in package-stack/keywords" name-sym)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
