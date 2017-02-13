@@ -1,4 +1,4 @@
-;;; package-stack --- Configuration Manager with Elegant Dependence Managing.
+;;; package-stack.el --- Configuration Manager with Elegant Dependence Managing
 
 ;; Copyright (C) 2017- Junyoung Clare Jang
 
@@ -10,6 +10,21 @@
 ;; Keywords: dotemacs startup speed config package
 ;; URL: https://github.com/ailrun/package-stack
 
+;; This file is not part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with package-stack; see the file COPYING.  If not, see
+;; <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -62,7 +77,7 @@ just ignored with ‘package-stack’ itself."
   (--reduce-from
    (if (keywordp it)
        (progn
-         (when (alist-get it acc)
+         (when (assq it acc)
            (error "%s has duplicated keyword %s"
                   it name-sym))
          (cons (cons it nil) acc))

@@ -1,0 +1,29 @@
+# Use light weight image
+language: C
+
+notifications:
+  email: false
+
+env:
+  matrix:
+    - EMACS=emacs-24.1-travis
+    - EMACS=emacs-24.2-travis
+    - EMACS=emacs-24.3-travis
+    - EMACS=emacs-24.4-travis
+    - EMACS=emacs-24.5-travis
+    - EMACS=emacs-25.1-travis
+
+before-install:
+  - curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
+  - export PATH="$HOME/.evm/bin:$PATH"
+  - evm config path /tmp
+  # For appropriate cask install
+  - evm install emacs-24.3-travis --use --skip > /dev/null 2>&1
+  - curl -fsSkL https://raw.github.com/cask/cask/master/go | python
+  - export PATH="$HOME/.cask/bin:$PATH"
+  - evm install $EMACS --use --skip > /dev/null 2>&1
+
+script:
+  - emacs --version
+  - cask install
+  - cask exec ert-runner

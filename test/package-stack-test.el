@@ -1,4 +1,4 @@
-;;; package-stack-test --- Test for package-stack
+;;; package-stack-test.el --- Test for package-stack
 
 ;; Copyright (C) 2017- Junyoung Clare Jang
 
