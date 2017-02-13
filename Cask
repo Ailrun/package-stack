@@ -3,8 +3,9 @@
 
 (package-file "package-stack.el")
 
-(files ("*.el"))
+(files "*.el")
+
+(depends-on "dash")
 
 (development
- (depends-on "dash")
- (depends-on "ert-runner"))
+  (depends-on "ert-runner"))
