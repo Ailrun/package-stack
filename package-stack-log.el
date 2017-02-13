@@ -1,4 +1,4 @@
-;;; package-stack-log --- Log functions for package-stack
+;;; package-stack-log.el --- Log functions for package-stack
 
 ;;; Commentary:
 
