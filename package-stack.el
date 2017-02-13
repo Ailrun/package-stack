@@ -1,4 +1,4 @@
-;;; package-stack --- Configuration Manager with Elegant Dependence Managing.
+;;; package-stack.el --- Configuration Manager with Elegant Dependence Managing
 
 ;; Copyright (C) 2017- Junyoung Clare Jang
 
@@ -10,6 +10,7 @@
 ;; Keywords: dotemacs startup speed config package
 ;; URL: https://github.com/ailrun/package-stack
 
+;; This file is not part of GNU Emacs.
 
 ;;; Commentary:
 
