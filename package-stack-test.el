@@ -15,7 +15,36 @@
 
 (require 'package-stack)
 
-;; TEST:
+
+(ert-deftest package-stack/:ignored ()
+  "Test ‘:ignored’ keyword.
+
+With ‘:ignored’ keyword, package-stack settings must be ignored that
+without any error, even when the setting is invalid one."
+  (should
+   (null
+    (macroexpand-all
+     '(package-stack test-package
+        :ignored))))
+  (should
+   (null
+    (macroexpand-all
+     '(package-stack test-package
+        :ignored
+        :no-such-keyword))))
+  (should
+   (null
+    (macroexpand-all
+     '(package-stack test-package
+        :ignored
+        :now nil))))
+  (should
+   (null
+    (macroexpand-all
+     '(package-stack test-package
+        :ignored
+        :now this-is-illegal)))))
+
 (ert-deftest package-stack/:now--valid-args ()
   "Test valid arguments for ‘:now’ keyword.
 
@@ -131,7 +160,7 @@ are invalid."
   "Test valid arguments for ‘:modes’ keyword.
 
 For ‘:modes’, cons cells of string and symbol or a list of
-cons cells of string and symbol is valid."
+cons cells of string and symbol are valid."
   (should
    (macroexpand-all
     '(package-stack test-package
@@ -164,7 +193,7 @@ cons cells of string and symbol is valid."
   "Test invalid arguments for ‘:modes’ keyword.
 
 For ‘:modes’, any arguments those are not cons cells of string or
-a list of cons of string and symbol is invalid."
+a list of cons of string and symbol are invalid."
   (should-error
    (macroexpand-all
     '(package-stack test-package
@@ -180,7 +209,7 @@ a list of cons of string and symbol is invalid."
   "Test valid arguments for ‘:interpreters’ keyword.
 
 For ‘:interpreters’, cons cells of string and symbol or a list of
-cons cells of string and symbol is valid."
+cons cells of string and symbol are valid."
   (should
    (macroexpand-all
     '(package-stack test-package
@@ -213,7 +242,7 @@ cons cells of string and symbol is valid."
   "Test invalid arguments for ‘:interpreters’ keyword.
 
 For ‘:interpreters’, any arguments those are not cons cells of string or
-a list of cons of string and symbol is invalid."
+a list of cons of string and symbol are invalid."
   (should-error
    (macroexpand-all
     '(package-stack test-package
@@ -224,6 +253,72 @@ a list of cons of string and symbol is invalid."
     '(package-stack test-package
        :interpreters
        (cons 1 nil)))))
+
+(ert-deftest package-stack/:commands--valid-args ()
+  "Test valid arguments for ‘:commands’ keyword.
+
+For ‘:commands’, a list of, strings or symbols is valid."
+  (should
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       nil)))
+  (should
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       ("test-command"))))
+  (should
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       (test-command))))
+  (should
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       ("test-command1" "test-command2"))))
+  (should
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       ("test-command1" test-command2))))
+  (should
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       (test-command1 "test-command2"))))
+  (should
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       (test-command1 test-command2)))))
+
+(ert-deftest package-stack/:commands--invalid-args ()
+  "Test invalid arguments for ‘:commands’ keyword.
+
+For ‘:commands’, any arguments those are not a list of,
+strings or symbols are invalid."
+  (should-error
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       t)))
+  (should-error
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       (cons 1 nil))))
+  (should-error
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       (cons 1 0))))
+  (should-error
+   (macroexpand-all
+    '(package-stack test-package
+       :commands
+       [test-command]))))
 
 (provide 'package-stack-test)
 
