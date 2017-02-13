@@ -77,7 +77,7 @@ just ignored with ‘package-stack’ itself."
   (--reduce-from
    (if (keywordp it)
        (progn
-         (when (alist-get it acc)
+         (when (assq it acc)
            (error "%s has duplicated keyword %s"
                   it name-sym))
          (cons (cons it nil) acc))
