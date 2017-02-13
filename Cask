@@ -3,7 +3,7 @@
 
 (package-file "package-stack.el")
 
-(files "*.el")
+(files ("*.el"))
 
 (development
  (depends-on "dash")

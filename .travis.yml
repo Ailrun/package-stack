@@ -31,6 +31,5 @@ install:
   - export PATH="${HOME}/.cask/bin:$PATH"
 
 script:
-  - echo $EMACS --version
   - cask install
   - cask exec ert-runner
