@@ -3,11 +3,11 @@ language: C
 
 env:
   matrix:
-    - EMACS=emacs24.1
-    - EMACS=emacs24.2
-    - EMACS=emacs24.3
-    - EMACS=emacs24.4
-    - EMACS=emacs24.5
+    - EMACS=emacs-24.1
+    - EMACS=emacs-24.2
+    - EMACS=emacs-24.3
+    - EMACS=emacs-24.4
+    - EMACS=emacs-24.5
 
 install:
   - sudo mkdir /usr/local/evm &&
