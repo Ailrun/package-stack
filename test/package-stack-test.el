@@ -13,6 +13,7 @@
 
 ;;; Code:
 
+(require 'ert)
 (require 'package-stack)
 
 
@@ -31,7 +32,7 @@ without any error, even when the setting is invalid one."
     (macroexpand-all
      '(package-stack test-package
         :ignored
-        :no-such-keyword))))
+        :some-weird-keyword))))
   (should
    (null
     (macroexpand-all
